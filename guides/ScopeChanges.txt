@@ -1,0 +1,28 @@
+
+
+Support Provided (already in place):
+1. WebSPA
+2. Docker-compose (docker-compose.yaml & docker-compose.override.yml files)
+3. Catalog.API
+4. Identity.API
+
+
+Your challenges:
+1. API Gateways
+1. Coupon.API
+2. Basket.API
+   - BasketController.cs
+   - UserCheckoutAcceptedIntegrationEvent.cs
+   - BasketCheckout.cs
+
+3. Ordering (will be guided) 
+   - Ordering.API
+   - Ordering.Domain
+   - Ordering.Infrastructure
+   - Ordering.SignalrHub
+
+
+
+
+
+

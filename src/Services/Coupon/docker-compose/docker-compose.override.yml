@@ -1,0 +1,66 @@
+version: '3.4'
+
+services:
+
+  nosqldata:
+    ports:
+      - "27017:27017"
+    volumes:
+      - coupon-nosqldata:/data/db
+
+  rabbitmq:
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  sqldata:
+    environment:
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
+    ports:
+      - "5433:1433"
+    volumes:
+      - identity-sqldata:/var/opt/mssql
+
+  coupon-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - AzureServiceBusEnabled=False
+      - CheckUpdateTime=30000
+      - ConnectionString=mongodb://nosqldata
+      - EventBusConnection=rabbitmq
+      - IdentityUrlExternal=http://localhost:5105
+      - identityUrl=http://identity-api
+      - PATH_BASE=/coupon-api
+      - Serilog__MinimumLevel__Override__coupon-api=Verbose
+      - Serilog__MinimumLevel__Override__Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ=Verbose
+    ports:
+      - "5106:80"
+
+  identity-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - SpaClient=http://localhost:5104
+      - XamarinCallback=http://localhost:5105/xamarincallback
+      - ConnectionString=Server=sqldata;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word
+      - MvcClient=http://localhost:5100
+      - BasketApiClient=http://localhost:5103
+      - OrderingApiClient=http://localhost:5102
+      - MobileShoppingAggClient=http://localhost:5120
+      - WebShoppingAggClient=http://localhost:5121
+      - WebhooksApiClient=http://localhost:5113
+      - WebhooksWebClient=http://localhost:5114
+      - CouponApiClient=http://localhost:5106
+      - UseCustomizationData=True
+      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
+      - OrchestratorType=${ORCHESTRATOR_TYPE}
+    ports:
+      - "5105:80"
+
+volumes:
+  coupon-nosqldata:
+    external: false
+  identity-sqldata:
+    external: false

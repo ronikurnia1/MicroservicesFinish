@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+
+  nosqldata:
+    image: mongo
+  
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2019-latest 
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+  identity-api:
+    image: ${REGISTRY:-eshop}/identity.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: ../../../
+      dockerfile: Services/Identity/Identity.API/Dockerfile
+    depends_on:
+      - sqldata
+
+  coupon-api:
+    image: ${REGISTRY:-eshop}/coupon.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: ../../../
+      dockerfile: Services/Coupon/Coupon.API/Dockerfile
+    depends_on:
+      - nosqldata
+      - rabbitmq
